@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="robots" content="noindex,nofollow" />
+<title>户籍查询 · 明理高中</title>
+<style>
+  :root {
+    --bg: #f4f7fb;
+    --card: #ffffff;
+    --ink: #1a2332;
+    --muted: #5b6b7c;
+    --line: #e3eaf2;
+    --primary: #1f6feb;
+    --primary-press: #1557c0;
+    --ok: #0f7b4c;
+    --ok-bg: #e8f8ef;
+    --warn: #b45309;
+    --warn-bg: #fff7e8;
+    --err: #b42318;
+    --err-bg: #fef3f2;
+    --shadow: 0 10px 30px rgba(26, 35, 50, 0.08);
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background:
+      radial-gradient(1200px 600px at 10% -10%, #dbeafe 0%, transparent 55%),
+      radial-gradient(900px 500px at 100% 0%, #e0e7ff 0%, transparent 50%),
+      var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+  .wrap {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 28px 18px 48px;
+  }
+  header {
+    text-align: center;
+    margin-bottom: 22px;
+  }
+  .badge {
+    display: inline-block;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: var(--primary);
+    background: #eaf2ff;
+    border: 1px solid #d5e5ff;
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-bottom: 10px;
+  }
+  h1 {
+    font-size: 1.55rem;
+    margin: 0 0 8px;
+    font-weight: 700;
+  }
+  .sub {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin: 0;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 22px 20px;
+  }
+  label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 0 0 6px;
+  }
+  .field { margin-bottom: 16px; }
+  input[type="text"] {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    font-size: 1rem;
+    outline: none;
+    background: #fbfdff;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  input[type="text"]:focus {
+    border-color: #93c5fd;
+    box-shadow: 0 0 0 4px rgba(31, 111, 235, 0.12);
+    background: #fff;
+  }
+  .hint {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+  .actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+  }
+  button {
+    appearance: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 12px;
+    padding: 12px 16px;
+  }
+  .btn-primary {
+    flex: 1;
+    color: #fff;
+    background: var(--primary);
+  }
+  .btn-primary:hover { background: var(--primary-press); }
+  .btn-primary:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+  .btn-ghost {
+    color: var(--muted);
+    background: #f3f6fa;
+    border: 1px solid var(--line);
+  }
+  #result {
+    margin-top: 18px;
+    display: none;
+  }
+  .result-box {
+    border-radius: 14px;
+    padding: 16px 16px 14px;
+    border: 1px solid transparent;
+  }
+  .result-box.ok { background: var(--ok-bg); border-color: #b7ebc9; color: var(--ok); }
+  .result-box.warn { background: var(--warn-bg); border-color: #fcd9a0; color: #92400e; }
+  .result-box.err { background: var(--err-bg); border-color: #fecdca; color: var(--err); }
+  .result-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 0 0 6px;
+  }
+  .result-desc {
+    margin: 0;
+    font-size: 0.95rem;
+    color: inherit;
+    opacity: 0.95;
+  }
+  .materials {
+    margin: 14px 0 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: mat;
+  }
+  .materials li {
+    counter-increment: mat;
+    position: relative;
+    background: #fff;
+    border: 1px solid #f1e3c8;
+    border-radius: 12px;
+    padding: 12px 12px 12px 44px;
+    margin-bottom: 8px;
+    color: var(--ink);
+    font-size: 0.92rem;
+  }
+  .materials li::before {
+    content: counter(mat);
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #f59e0b;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 24px;
+    text-align: center;
+  }
+  .note {
+    margin-top: 18px;
+    font-size: 0.82rem;
+    color: var(--muted);
+    text-align: center;
+  }
+  footer {
+    margin-top: 22px;
+    text-align: center;
+    color: #8a97a8;
+    font-size: 0.78rem;
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="badge">明理高中 · 内部查询</div>
+      <h1>学生户籍查询</h1>
+      <p class="sub">请输入学生姓名与身份证号，查询是否属于省外户籍，以及是否需要提交随迁材料。</p>
+    </header>
+
+    <div class="card">
+      <form id="queryForm" autocomplete="off">
+        <div class="field">
+          <label for="name">学生姓名</label>
+          <input id="name" name="name" type="text" placeholder="请输入与学籍一致的姓名" required maxlength="30" />
+        </div>
+        <div class="field">
+          <label for="idno">身份证号</label>
+          <input id="idno" name="idno" type="text" placeholder="18 位身份证号" required maxlength="18" inputmode="text" />
+          <div class="hint">末位为 X 时请用大写或小写字母均可</div>
+        </div>
+        <div class="actions">
+          <button type="submit" class="btn-primary" id="submitBtn">查询</button>
+          <button type="button" class="btn-ghost" id="resetBtn">清空</button>
+        </div>
+      </form>
+
+      <div id="result" aria-live="polite"></div>
+    </div>
+
+    <p class="note">本页数据已加密嵌入，仅在姓名与身份证号同时正确时才能解密对应结果。请勿截图传播他人信息。</p>
+    <footer>数据仅供本校户籍材料核验使用</footer>
+  </div>
+
+<script>
+const PEPPER = new TextEncoder().encode("mingli-hukou-query-v1");
+const RECORDS = {"6213463c71de2282d781f535fea7b1b14b3d885ccb4cdd0b6c9b09e752d616e0":"EVNyhqCrZ1qTR69iF4mvIf35/DsHE6EUrgcxkU12e1GmEc1rjwiU","275130e552e104273c6f293d5cddc70bc6fa2fdac0583b310afbdfd7e4258b43":"AfCrdoZwSva0qXcL2LZ8dibwnNJsfD/DHjOuB/vPF18wUMgpRaac","d5e538f0d21238a8ab9cc67ee5b45deb09a6844942bb2fd2bba65c974620df7c":"4gcX2ealgLA2/iPI0ZEng6MoZXvGBb+ivjVXkjdEko0wurOGshUm","e108425958de0aa60de09f2162bcbd203c46be0e866c1211f74e6d67ef1a3178":"kkrYbKtK0ayocjhR/B4Vl5sbGGAlF4X76LZSfIwRk7AT0FMc3vvA","851ed45f4902ffa21cf91e61dde647a4cda90aac252553b6cca0bcf68083ca1e":"WF3yl7G8iYx2pUTnIpasP3CCZKm9RcXs6z6b3vLhJZKCLRgPOGLI","823a59c351f4cc30022bff1327da4051893145a22818ff3f930293fe479a856f":"JPPhrOi4W63wWENI8BUMjn7ptGstUVXC/EnyjRmx7sjNbc4vhYp8","e8ce66d55945225cdf07c47c3fe2ad3b83f67c688ce5e3946d8e39e34f742388":"VnjQKBL0qFjPQOwCjRldHuaXloNEV983MRHQYGEsGbE5JDQmcDRH","118129703ed4b5b58ae181f5e0c1bbe40064b588ee5c214a3829d28d506be869":"jONZxhdd5neSHztHjXey7z13pzKoZmcOuBaswz3AvdWHQb0cBk1A","46cddd1b099c708845653698be2b6cbddc51b415716880ae69468251f5196cbb":"JucpKOH+oNcCEEjMAOvXS8SWxpuXjSzM3jJz32dCp8688klg2aN9","13fe303f9faec177b083169c147cc8e5bddf7432f6b35f4eb0742751fcfff78e":"hXYpesj1j8Uv9Iy+Pp8zalxyqQ7B55aBUTXPJ5NgxX9jPp/TG7uO","8056f1dfc0e97356e59d3c144e7641eb10e2d10556224b17372c2c4993316a39":"SynntPlFHlwVJl94vZ9ovgPdgusdE8xvXXaegAGopFSzIEf/OpNL","0b2ca5e8e4157320f8b6f8d87079114425550459d8ea85155156554bd035460e":"Wt2oUwF5CiR8jZtj6cD0qUPvLXk1iyLviCH1SMhuANxVjPHcIBej","d61124a102e3ccbf7a9a686d50697b65474846d3e22f3f9ebf6731006bd7c19c":"lf/A8an7lBHVEoSP01vXNH03Z23EFxaESnf8+IMV+RjD8JgSMV8Y","1ccd2aa86399faeefdacf3dff35fd242bb1d50244c770f20b2f2a219e7d7afe9":"H2Fo+NcUiyUXz/Jthzd6s7jZkPzZwbBj1wg8RSDHCZwusOGCzXvS","aebbc759bcef3eb8df978d23a4d03ac7d333d9411e1e377e908d377b26acc7ac":"zTLUKuTd69GWz6ju8p70Caxv+K/WXjUj1Bb4m3fB5Cp2SBppWueE","9676572da2fb4ccfa0a2790b515501df03a84dfe58143ad7717c1373490dc935":"xB4HuHla82EAQcG2I/X93k2zhDbSjEoko+zZR5r87ml7DpeokxCY","90109aad6bea131d790aac9146c5dd262d3ba7c2ebfbfc65782047597b4afa48":"twcH9nC2wpGjq+upGxQ0MNnc3WywB38j/dm0CN3tkHfquCAcGTEV","bc0d0e11630441c0affa9cb11c346f66fd70c4269162afa7e864e190ddcea04c":"f6iM3Lc/cn8xPGtGi8FPsoxogJAjBNyxH8FALxAkAci6m01nhU4orA==","5179214fcfa74feb0636abf524c736a8c4da9a47d6452b8fc91ecabe6d45351b":"TeimTjFE8psdZ/Mi2mvzVep6gE5s6UR29JTccyc/JY2JGt4swE2O/A==","6f8b2fc209355cb81902f54026685d46f3bb372aba28fd554a9f9aae23781abd":"ZEnH8NWIi1SGoaEKTmGMjY6BWv6D4gwVQDt/wpjBM0k6l9rDDKYP","c573000333edfd5a02db9cad8403981aad70ff192f75e78f1a9f7bfe9d54a7a2":"qDIp1m/8QQ73eKY7UUqJ6y0Xo/gW3hjbKvjqypeyhaZzrDwapHhs","52437aaf66a95cee8a241b5bfc7f4cd6dc609490694552a665e05d2d771bc571":"jdNEP3It+O+RjL1HK2kr9BoW7AAVj8AfbNOd8EYxXyb6YqkU9Jkv","44fb82ba677062e11476bab41d2b22ac465613d5a0efe1634cdd5998cc0dd2c7":"+aEPA0gvv4f1nNekwbQdk8U9zRSHqwVRjJrPCW7sw1CgI6p+pyJf","90ec9bc638dbc195c359633e62993e507310474a69168e200cba6dea4dd04b08":"gpWFoQvaEbE4XdijCtaKRvKa0cRJwYf6J1FrNbkgG5ouoVyoTb3FHA==","f6b4d74a3be3ea2cde58e2a1bcdf38ffb2eb1842e5a199876fe5d9bc097aba90":"PuQi3d2GvSRje7RUT8//Xr/dfsJ9JEme6CfMFoirtRWZtT5AV2yRQQ==","410ed2b30dd80788e2a55ecbe3e2b935cb8f6176b46e0c10bd1e5e260cfec799":"2LZL5Cu57ovfxOiM/zoribbtySbhMDBpHDOMCsmexz/emr8q3Hc9","f23d6dd1e247da651abce829a4ea759971c7c6be6a5221f205452eae1afccb72":"vLQVHzOsJJ481urdyKz8tY3O2BWi+6e1aRK5K1TzHjPYKa+nliwG","231742262558dcd83584fe9ae1ed57b126a3f59803e8dccbbeedc19b2e44c3db":"FV5E9q7YntkkzXVVjklV04OGOYbLzMvsUbyce3yOHieYInVZHjyfeg==","6d8a8df126e119da7a2b92922a1c91926e53187e23ecd8921769cfc985b9c145":"MO1LOHjVWZDDpwc2V15AC4kfJiAQLDc/LBcmZZoiL8pBTOt7VLIi","62c4cd603a6e77a42285a39a2dfa075cd2006c54926ab902302bb425ccfbd66d":"2aNDBpDbBS/guXlUe//u2Fjz4zg2oRyUzdimki4iTXsznWBG8iBY","02ab1123b914e15ac3c171333ca7a1c5d2758558f5b497e7ace765c9a1bfeea9":"VMhBsLdGpZOczcneW1xqXr7bYOSMiQW7VFjm+1q+LgxOrFQ09LO+","693ab73f1bfecdd2e6ac5899b057d1246a71398f7e143c8e78454900176f377d":"Az/wYFRkjbEVDT4GcVsPHgJ5uy0CLifEDoR2c0kropQKiPFITWXi","9b8be46632b53c411190e3a08fc829bad4572a1f364c13e82ac65c376ba95f45":"pMM4S3lBDNLb4c5TKFPip4RtdUVEdUuPmOPHrHhB5uiykzKy60c4","3692eb392312592072eaa0ecabc58622abb570b253efd2768f3484873760784c":"fPUzLQP7o51lR3dE2ujTydKCD8pL4kMvpjRwF32HsEfbinM7YGIB","2d59fdd2c0f14bd2a99cd91d31ba8486cbac4e4f2b9af8d99c0365d72f64e7e0":"Q6DzB/xgNgFP4ZPkUA9NrlrSLCkjLVHmrVn0ZOWglCIWYwsowRPH","f478be13c2c9e82c124e00d5582443225dabc128f82a681c40831d26a12a8495":"S+EIqdZsrfAROywJ2YxqoBpyz9TdmxiI+Du39rKjvAcxfcmL3y+xJA==","433300810a8fcec744049a536423117150c416a854509b4ce9c163e5427a3b56":"jBhKFGBlbfpc6q0ak576HC4HpgpRsNjdHJ1uptXachxNV3fVOA+t","91558eb3ad51e827c24576f8371ed8bc00f3a6322f0b3fe90f7db2808bbb46ed":"Cp3Bu+RjpQZd9OE0VwfTH1NoIDbWTiuRsuHrW+JklNaubeon1Ziv","c856b0a35294dcedb92976c0b633966bf249cbd578b7656700bcc3c03723b1ae":"YUgTg0FF65ToIDcKJrKgiqXKVwG3DF7s8wIf81/3VK4kw89m3jMU","b07058999fe5086b7d53c52500d5968ff0fd9d511a105d9d5873013659ef16e4":"erPO5EuteAaJOMiX6hJbZD4awjYdgqsAFRHoxgi2LQr4p0YeWpjX","d4a95a4708349aef944bf0472f1a577d7d372aa837f46edec7bb6b618a5989a4":"TMQRfgLdR1LkswM8X4uJ3cetJMgBVnyTBRXoeZ69RzbVx57mPINy","b4d81bd87d1671c17c22cb8d3c9a4a57d22525aeb9817d9d6674629ae1463138":"K3JpOWuM9Y4Xm/Ha+mzFDraTVUM/inooiaf6VEz13sCTJ+U7z4Hb","018a00bbca7c0f84800620ab71d0683be9f54f7e3b8589c565c5c4bb14d18604":"3AffLycQqmRNUs8mH8g/b/1QFbKoY2GhRPTujn/6Z/OzgMgNB81n","0825a8bd3290b1febff326a836981d641a910344663d7c5b591e0e565b754302":"6v071z/w1GOc2BGuAAOinIuXEXK4bDs811lLqELIWs55GchLkqrR","80ef881f92c3a53d475ede548b6dd7b66bbd0556144b085aa5d1b2730b588e6b":"BUm81DKo9FWCBotETQIvROnJoinMm3jlvFcxA9TN4f2Z/aQUr8Vp","6079c4ee544d8792bf5b80ff2ac13e59dc52feeff9964c2c1702d06e5090416e":"AvBOYuwFUFKw7CGekzBBXa4MLImA6XFBOrKfJpBrxhgSaHTv/ePzrg==","e03045d4c2f7828d2f2ce702cea57bae0237602c08f7d46f7beb8fe1ca5f86c9":"Q+FKAyXc6AmB5J6pWgFrpwAvWF+ZyriC3ksTjfHgYbyNmdkbIRiozw==","bc010ff1d513308cdbda0bfa690ca97ab77d0ecabd2d43f1782f1236fdc338d8":"YlzIhjY78tgHPycI1h3HBXubF/PdRm/q6coVrNmUoEEO8lIYhpG4","3d9b4730c3d577a5bf9c51a1d493dce1ea1962954ef98a2ec942902e1bf3428f":"oMlm/iJ345z3WW8j8QgTET5bWpNgWn5nP7UkqIusJXeNiigpdC7X5sgDr1U=","8520eee28bcebc7c8a74b4dc34a25f3ef3c3d9022cace2b20c3122ccd3cc9642":"iL0cj0Cr24HhKAxXngGPYTvRqMJe3f3/G/h3VnzfDjG09PYbeIIE","20661390c2dcd8a1b651807ee4f7215e93ba4400cc46b05bc9896888acaf4b0b":"JrKSgA/k+qeyuh2X0ZmnUYQrNkPr18cvR1OjxjRbLwUj6kbJMOm4","f00a5ce3ee7ef0b4d3cbd9e52c76b897eab052a72f30d5fa325d873340ee25b8":"BVGxeOb+p/rPoPs0VR5ZJ7i8FHaDIfx7Sjk5p7i0tyGZ3TEg+e+X","4d21685ff6ef14a416c97980d482d2a83f8f89941c9a98425cb6273b661310c2":"1GA/MjiIE38Es0q6O+XmKYHZBQF16T/lSU12c7en4pMk6peqF7zI","ed4cbf9906f87266dfccc2b0d1c92dcf608366ef14ff47d7ee38fe51adb0d168":"N51JRCtFOvWw4l7H4tJ+UlM5bzN3j9CrzbJRvJlR+kVtCQDonHF5","36a3a0cd026c7072b58d98e8fcea3ddffda10c06e5300d97a556b854f9a5170b":"UVdGnAYeVpqNqneW4bGFX6Ez2Dlb9Rzlll8Dp2nT8kuk8Bs0RG1N","0f85b1d1922697caabf6d7abde355a93a9cbb1c9c45b540e3b7ae9f975357ccb":"pggD+i1kl9Ow35ovhAj+JvtN5w7bSo9xozQdgEOVBYIvFT/wnSV6","ec8f315bc2dc63309e7a12b8a58ee15dadaf2e4fc5f28e21690e59c47e2329fc":"qlNVYK/M6cOnGcZQG+EJnJ/Yamuami84TzGtVyjA2EZ5ZvvqdWbg","5e2f105f6eab70ae9252b76e81afdfee78e66c60bbdbbf16f79690d7e4d1ecd5":"k68jpEuWBSyW0uD0PI7IQG2SYW1BrTD2ihR/e1iZBm95c6fx3iw5"};
+
+const MATERIALS = [
+  "学生身份证正反面复印件",
+  "学生及父母户口本（首页、本人页、户主页）复印件",
+  "附加证明（例如：出生证明）",
+  "居住证复印件",
+  "深圳经济特区居住信息单",
+  "社保卡复印件",
+  "深圳市社会保险参保证明"
+];
+
+function normalizeName(s) {
+  return String(s || "").replace(/\s+/g, "").toUpperCase();
+}
+function normalizeId(s) {
+  return String(s || "").trim().replace(/\s+/g, "").toUpperCase();
+}
+function concatBytes(...parts) {
+  const total = parts.reduce((n, p) => n + p.length, 0);
+  const out = new Uint8Array(total);
+  let o = 0;
+  for (const p of parts) { out.set(p, o); o += p.length; }
+  return out;
+}
+function toHex(buf) {
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
+}
+function b64ToBytes(b64) {
+  const bin = atob(b64);
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+async function sha256(bytes) {
+  return new Uint8Array(await crypto.subtle.digest("SHA-256", bytes));
+}
+async function derive(name, idno) {
+  const material = new TextEncoder().encode(`${normalizeName(name)}|${normalizeId(idno)}`);
+  const lookupHash = toHex(await sha256(concatBytes(new TextEncoder().encode("lookup|"), material, PEPPER)));
+  const aesKeyRaw = await sha256(concatBytes(new TextEncoder().encode("aes|"), material, PEPPER));
+  const aesKey = await crypto.subtle.importKey("raw", aesKeyRaw, { name: "AES-GCM" }, false, ["decrypt"]);
+  return { lookupHash, aesKey };
+}
+async function decryptRecord(aesKey, b64) {
+  const raw = b64ToBytes(b64);
+  const nonce = raw.slice(0, 12);
+  const data = raw.slice(12);
+  const plain = await crypto.subtle.decrypt({ name: "AES-GCM", iv: nonce }, aesKey, data);
+  return JSON.parse(new TextDecoder().decode(plain));
+}
+
+function showResult(html) {
+  const el = document.getElementById("result");
+  el.style.display = "block";
+  el.innerHTML = html;
+}
+
+function renderIn() {
+  return `
+    <div class="result-box ok">
+      <p class="result-title">查询结果：省内户籍</p>
+      <p class="result-desc">该学生属于省内户籍，不需要额外提交随迁子女材料。</p>
+    </div>`;
+}
+function renderOut() {
+  const items = MATERIALS.map(t => `<li>${t}</li>`).join("");
+  return `
+    <div class="result-box warn">
+      <p class="result-title">查询结果：省外户籍</p>
+      <p class="result-desc">该学生属于省外户籍（随迁子女）。请家长准备并提交以下 7 项材料：</p>
+      <ol class="materials">${items}</ol>
+    </div>`;
+}
+function renderUnknown() {
+  return `
+    <div class="result-box err">
+      <p class="result-title">已找到记录，但户籍类别未完整录入</p>
+      <p class="result-desc">请联系学校教务或班主任核对纸质名单后再办理。</p>
+    </div>`;
+}
+function renderNotFound() {
+  return `
+    <div class="result-box err">
+      <p class="result-title">未查询到匹配信息</p>
+      <p class="result-desc">请核对姓名与身份证号是否与学籍信息一致。若确认无误仍无法查询，请联系学校工作人员。</p>
+    </div>`;
+}
+
+document.getElementById("queryForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const name = document.getElementById("name").value;
+  const idno = document.getElementById("idno").value;
+  const btn = document.getElementById("submitBtn");
+  if (!normalizeName(name) || !normalizeId(idno)) {
+    showResult(`<div class="result-box err"><p class="result-title">请填写完整信息</p><p class="result-desc">姓名和身份证号都不能为空。</p></div>`);
+    return;
+  }
+  if (normalizeId(idno).length !== 18) {
+    showResult(`<div class="result-box err"><p class="result-title">身份证号格式不正确</p><p class="result-desc">请输入 18 位身份证号。</p></div>`);
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = "查询中…";
+  try {
+    const { lookupHash, aesKey } = await derive(name, idno);
+    const blob = RECORDS[lookupHash];
+    if (!blob) {
+      showResult(renderNotFound());
+      return;
+    }
+    const payload = await decryptRecord(aesKey, blob);
+    if (payload.s === "in") showResult(renderIn());
+    else if (payload.s === "out") showResult(renderOut());
+    else showResult(renderUnknown());
+  } catch (err) {
+    console.error(err);
+    showResult(`<div class="result-box err"><p class="result-title">查询失败</p><p class="result-desc">解密或校验出错，请刷新页面后重试。若持续失败，请联系学校。</p></div>`);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "查询";
+  }
+});
+
+document.getElementById("resetBtn").addEventListener("click", () => {
+  document.getElementById("queryForm").reset();
+  const el = document.getElementById("result");
+  el.style.display = "none";
+  el.innerHTML = "";
+});
+</script>
+</body>
+</html>
